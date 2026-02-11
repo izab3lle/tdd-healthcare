@@ -22,6 +22,6 @@ HealthCare é um projeto desenvolvido com TDD para a cadeira de Gerência de Con
 | TC_010 | Realizar login de funcionário com senha vazia                       | [ ]   |
 | TC_011 | Realizar login de funcionário com senha inválida                    | [ ]   |
 | TC_012 | Realizar cadastro de Paciente com sucesso                           | [x]   |
-| TC_013 | Realizar cadastro da carteira do plano com sucesso                  | [ ]   |
-| TC_014 | Realizar cadastro de paciente com nome vazio                        | [ ]   |
+| TC_013 | Realizar cadastro da carteira do plano com sucesso                  | [x]   |
+| TC_014 | Realizar cadastro de paciente com nome vazio                        | [x]   |
 | TC_015 | Realizar cadastro de paciente com data de nascimento vazia          | [ ]   |

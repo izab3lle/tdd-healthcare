@@ -82,4 +82,22 @@ class PatientServiceTest {
         verify(cardRepo, times(1)).findById(patientDTO.getCardCode());
         verify(cardRepo, times(1)).save(any());
     }
+
+    @Test
+    @DisplayName("Cadastrar paciente com nome vazio")
+    public void cadastrarPacienteComNomeVazio() {
+        // Arrange
+        patientDTO.setName("");
+        
+        // Act
+        ResponseEntity<?> response = service.savePatient(patientDTO);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(patientRepo, never()).findById(patientDTO.getCpf());
+        verify(patientRepo, never()).save(any());
+        verify(cardRepo, never()).findById(patientDTO.getCardCode());
+        verify(cardRepo, never()).save(any());
+    }
+    
 }

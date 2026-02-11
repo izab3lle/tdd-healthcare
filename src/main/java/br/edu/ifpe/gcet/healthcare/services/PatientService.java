@@ -23,7 +23,7 @@ public class PatientService {
         Patient p = patientDTO.getPatient();
         HealthInsuranceCard c = patientDTO.getHealthInsuranceCard();
         
-        if(p.getEmail() == null || p.getEmail().isBlank()) {
+        if(p.getCpf() == null || p.getEmail().isBlank() || p.getName().isBlank()) {
             return ResponseEntity.badRequest().body("Credenciais inválidas!");
         }
 
@@ -42,5 +42,5 @@ public class PatientService {
         cardRepo.save(c);
         
         return ResponseEntity.ok().body("Paciente cadastrado com sucesso!");
-    } 
+    }
 }

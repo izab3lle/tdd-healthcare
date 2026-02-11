@@ -42,7 +42,11 @@ public class EmployeeService {
             try {
                 Object field = m.invoke(e);
                 
-                if(field == null || field.toString().isBlank()) return true;
+                if(field == null) return true;
+                
+                if(m.getReturnType() == String.class) {
+                    if(field.toString().isBlank()) return true;
+                }
                 
             } catch(InvocationTargetException | IllegalAccessException ex) {
                 throw new RuntimeException("Erro ao acessar um dos campos do objeto");
