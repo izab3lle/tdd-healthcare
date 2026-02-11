@@ -15,11 +15,11 @@ public class EmployeeService {
     private EmployeeRepository employeeRepo;
 
     public ResponseEntity<?> saveEmployee(Employee e) {
-        if(e.getEmail() == null || e.getEmail().isBlank()) {
+        if(e.getName() == null || e.getName().isBlank()) {
             return ResponseEntity.badRequest().build();
         }
         
-        Optional<Employee> employee = employeeRepo.findById(e.getId());
+        Optional<Employee> employee = employeeRepo.findEmployeeByEmail(e.getEmail());
         
         if(employee.isPresent()) {
             return ResponseEntity.badRequest().build();

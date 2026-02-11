@@ -7,18 +7,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Optional;
+
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class EmployeeServiceTest {
     @Mock
     private EmployeeRepository repository;
     
+    @Autowired
     @InjectMocks
     private EmployeeService service;
     
@@ -37,15 +40,29 @@ public class EmployeeServiceTest {
     @DisplayName("Cadastrar funcionário com sucesso")
     public void cadastrarFuncionarioComSucesso() {
         // Arrange
-        when(repository.findById(e.getId())).thenReturn(Optional.empty());
+        when(repository.findEmployeeByEmail(e.getEmail())).thenReturn(Optional.empty());
         when(repository.save(e)).thenReturn(e);
 
         // Act
-        String responseBody = (String) service.saveEmployee(e).getBody();
+        ResponseEntity<?> response = service.saveEmployee(e);
+        
+        // Assert
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(repository, times(1)).findEmployeeByEmail(e.getEmail());
+        verify(repository, times(1)).save(e);
+    }
+
+    @Test
+    @DisplayName("Cadastrar funcionário com nome vazio")
+    public void castrarFuncionarioComNomeVazio() {
+        // Arrange
+        e.setName("");
+
+        // Act
+        ResponseEntity<?> response = service.saveEmployee(e);
 
         // Assert
-        Assertions.assertEquals("Funcionário cadastrado com sucesso!", responseBody);
-        verify(repository, times(1)).findById(e.getId());
-        verify(repository, times(1)).save(e);
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(repository, never()).save(e);
     }
 }
