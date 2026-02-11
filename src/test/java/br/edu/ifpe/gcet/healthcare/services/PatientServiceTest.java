@@ -72,7 +72,7 @@ class PatientServiceTest {
     @DisplayName("Cadastrar carteira do plano com sucesso")
     public void cadastrarCarteiraDoPlanoComSucesso() {
         // Arrange
-        when(patientRepo.findById(patientDTO.getCpf())).thenReturn(Optional.empty());
+        when(cardRepo.findById(patientDTO.getCardCode())).thenReturn(Optional.empty());
 
         // Act
         ResponseEntity<?> response = service.savePatient(patientDTO);
