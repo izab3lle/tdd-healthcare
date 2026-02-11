@@ -108,4 +108,18 @@ public class EmployeeServiceTest {
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(repository, never()).save(e);
     }
+    
+    @Test
+    @DisplayName("Cadastrar funcionário sem setor")
+    public void cadastrarFuncionarioSemSetor() {
+        // Arrange
+        e.setDepartment(null);
+
+        // Act
+        ResponseEntity<?> response = service.saveEmployee(e);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(repository, never()).save(e);
+    }
 }
