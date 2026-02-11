@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Component
@@ -15,7 +18,7 @@ public class EmployeeService {
     private EmployeeRepository employeeRepo;
 
     public ResponseEntity<?> saveEmployee(Employee e) {
-        if(e.getName() == null || e.getName().isBlank()) {
+        if(e.getPassword().length() < 6 || isAnyFieldEmptyOrBlank(e)) {
             return ResponseEntity.badRequest().build();
         }
         
@@ -28,5 +31,24 @@ public class EmployeeService {
         employeeRepo.save(e);
         
         return ResponseEntity.ok().body("Funcionário cadastrado com sucesso!");
+    }
+    
+    private boolean isAnyFieldEmptyOrBlank(Employee e) {
+        Method[] fields = Arrays.stream(e.getClass().getMethods())
+                .filter(m -> m.getName().contains("get") && !m.getName().contains("Id"))
+                .toArray(Method[]::new);
+        
+        for(Method m : fields) {
+            try {
+                Object field = m.invoke(e);
+                
+                if(field == null || field.toString().isBlank()) return true;
+                
+            } catch(InvocationTargetException | IllegalAccessException ex) {
+                throw new RuntimeException("Erro ao acessar um dos campos do objeto");
+            }
+        }
+        
+        return false;
     }
 }

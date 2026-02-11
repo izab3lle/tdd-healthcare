@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +62,48 @@ public class EmployeeServiceTest {
         // Act
         ResponseEntity<?> response = service.saveEmployee(e);
 
+        // Assert
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(repository, never()).save(e);
+    }
+
+    @Test
+    @DisplayName("Cadastrar funcionário com email vazio")
+    public void castrarFuncionarioComEmailVazio() {
+        // Arrange
+        e.setEmail("");
+
+        // Act
+        ResponseEntity<?> response = service.saveEmployee(e);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(repository, never()).save(e);
+    }
+
+    @Test
+    @DisplayName("Cadastrar funcionário com senha vazia")
+    public void castrarFuncionarioComSenhaVazia() {
+        // Arrange
+        e.setPassword("");
+
+        // Act
+        ResponseEntity<?> response = service.saveEmployee(e);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(repository, never()).save(e);
+    }
+    
+    @Test
+    @DisplayName("Cadastrar funcionário com senha abaixo do tamanho mínimo")
+    public void cadastrarFuncionarioComSenhaInvalida() {
+        // Arrange
+        e.setPassword("123");
+        
+        // Act
+        ResponseEntity<?> response = service.saveEmployee(e);
+        
         // Assert
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(repository, never()).save(e);
