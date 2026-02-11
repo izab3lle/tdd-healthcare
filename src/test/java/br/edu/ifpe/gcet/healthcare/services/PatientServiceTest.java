@@ -56,7 +56,7 @@ class PatientServiceTest {
     @Test
     @DisplayName("Cadastrar paciente com sucesso")
     public void cadastrarPacienteComSucesso() {
-
+        // Arrange
         when(patientRepo.findById(patientDTO.getCpf())).thenReturn(Optional.empty());
         
         // Act
@@ -66,5 +66,20 @@ class PatientServiceTest {
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(patientRepo, times(1)).findById(patientDTO.getCpf());
         verify(patientRepo, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("Cadastrar carteira do plano com sucesso")
+    public void cadastrarCarteiraDoPlanoComSucesso() {
+        // Arrange
+        when(patientRepo.findById(patientDTO.getCpf())).thenReturn(Optional.empty());
+
+        // Act
+        ResponseEntity<?> response = service.savePatient(patientDTO);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(cardRepo, times(1)).findById(patientDTO.getCardCode());
+        verify(cardRepo, times(1)).save(any());
     }
 }

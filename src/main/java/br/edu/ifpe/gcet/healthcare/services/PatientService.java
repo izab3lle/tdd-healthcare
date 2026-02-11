@@ -27,9 +27,14 @@ public class PatientService {
             return ResponseEntity.badRequest().body("Credenciais inválidas!");
         }
 
+        if(c.getCode() == null || c.getCode().isBlank()) {
+            return ResponseEntity.badRequest().body("Credenciais da carteira do plano inválidas!");
+        }
+
         Optional<Patient> patient = patientRepo.findById(p.getCpf());
+        Optional<HealthInsuranceCard> card = cardRepo.findById(c.getCode());
         
-        if(patient.isPresent()) {
+        if(patient.isPresent() || card.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
         
