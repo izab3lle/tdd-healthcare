@@ -12,8 +12,6 @@ public class Patient {
     @Column(nullable = false)
     private String name;
     private String email;
-    @Column(nullable = false)
-    private String password;
     private long birthDate;
 
     public String getCpf() {
@@ -38,14 +36,6 @@ public class Patient {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public long getBirthDate() {

@@ -1,7 +1,9 @@
 package br.edu.ifpe.gcet.healthcare.services;
 
+import br.edu.ifpe.gcet.healthcare.dto.NewPatientDTO;
 import br.edu.ifpe.gcet.healthcare.entities.HealthInsuranceCard;
 import br.edu.ifpe.gcet.healthcare.entities.Patient;
+import br.edu.ifpe.gcet.healthcare.repositories.HealthInsuranceCardRepository;
 import br.edu.ifpe.gcet.healthcare.repositories.PatientRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,44 +26,45 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class PatientServiceTest {
     @Mock
-    private PatientRepository repository;
+    private PatientRepository patientRepo;
+
+    @Mock
+    private HealthInsuranceCardRepository cardRepo;
     
     @Autowired
     @InjectMocks
     private PatientService service;
     
-    private Patient p;
-    private HealthInsuranceCard pCard;
+    private NewPatientDTO patientDTO;
     
     @BeforeEach
     public void initMockPatient() throws ParseException {
-        p = new Patient();
-        p.setCpf("355.129.694-47");
-        p.setEmail("paciente@gmail.com");
-        p.setName("Paciente");
-        p.setBirthDate(new SimpleDateFormat("MM/dd/yyyy")
+        patientDTO = new NewPatientDTO();
+
+        patientDTO.setCpf("355.129.694-47");
+        patientDTO.setEmail("paciente@gmail.com");
+        patientDTO.setName("Paciente");
+        patientDTO.setBirthDate(new SimpleDateFormat("MM/dd/yyyy")
                 .parse("22/12/1931").getTime());
-        
-        pCard = new HealthInsuranceCard();
-        pCard.setPatient(p);
-        pCard.setCode("193746824");
-        pCard.setName("SUS");
-        pCard.setExpirationDate(new SimpleDateFormat("MM/dd/yyyy")
+
+        patientDTO.setCardCode("193746824");
+        patientDTO.setCardName("SUS");
+        patientDTO.setCardExpirationDate(new SimpleDateFormat("MM/dd/yyyy")
                 .parse("02/05/2026").getTime());
     }
     
     @Test
     @DisplayName("Cadastrar paciente com sucesso")
     public void cadastrarPacienteComSucesso() {
-        // Arrange
-        when(repository.findById(p.getCpf())).thenReturn(Optional.empty());
+
+        when(patientRepo.findById(patientDTO.getCpf())).thenReturn(Optional.empty());
         
         // Act
-        ResponseEntity<?> response = service.savePatient(p);
+        ResponseEntity<?> response = service.savePatient(patientDTO);
         
         // Assert
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(repository, times(1)).findById(p.getCpf());
-        verify(repository, times(1)).save(p);
+        verify(patientRepo, times(1)).findById(patientDTO.getCpf());
+        verify(patientRepo, times(1)).save(any());
     }
 }

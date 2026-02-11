@@ -1,6 +1,9 @@
 package br.edu.ifpe.gcet.healthcare.services;
 
+import br.edu.ifpe.gcet.healthcare.dto.NewPatientDTO;
+import br.edu.ifpe.gcet.healthcare.entities.HealthInsuranceCard;
 import br.edu.ifpe.gcet.healthcare.entities.Patient;
+import br.edu.ifpe.gcet.healthcare.repositories.HealthInsuranceCardRepository;
 import br.edu.ifpe.gcet.healthcare.repositories.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +16,13 @@ public class PatientService {
     @Autowired
     private PatientRepository patientRepo;
     
-    public ResponseEntity<?> savePatient(Patient p) {
+    @Autowired
+    private HealthInsuranceCardRepository cardRepo;
+    
+    public ResponseEntity<?> savePatient(NewPatientDTO patientDTO) {
+        Patient p = patientDTO.getPatient();
+        HealthInsuranceCard c = patientDTO.getHealthInsuranceCard();
+        
         if(p.getEmail() == null || p.getEmail().isBlank()) {
             return ResponseEntity.badRequest().body("Credenciais inválidas!");
         }
@@ -25,6 +34,7 @@ public class PatientService {
         }
         
         patientRepo.save(p);
+        cardRepo.save(c);
         
         return ResponseEntity.ok().body("Paciente cadastrado com sucesso!");
     } 
