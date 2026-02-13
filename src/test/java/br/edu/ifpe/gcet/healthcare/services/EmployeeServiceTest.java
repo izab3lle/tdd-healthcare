@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -21,6 +22,9 @@ import static org.mockito.Mockito.*;
 public class EmployeeServiceTest {
     @Mock
     private EmployeeRepository repository;
+    
+    @Mock
+    private PasswordEncoder encoder;
     
     @Autowired
     @InjectMocks
