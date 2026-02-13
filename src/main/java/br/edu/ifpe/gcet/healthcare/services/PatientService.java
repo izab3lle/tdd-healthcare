@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
 import java.util.Optional;
 
 @Component
@@ -23,8 +24,16 @@ public class PatientService {
         Patient p = patientDTO.getPatient();
         HealthInsuranceCard c = patientDTO.getHealthInsuranceCard();
         
+        Calendar minBirthDate = Calendar.getInstance();
+        minBirthDate.add(Calendar.YEAR, -18);
+        long minBirthDateMillis = minBirthDate.getTimeInMillis();
+        
         if(p.getCpf() == null || p.getEmail().isBlank() || p.getName().isBlank()) {
             return ResponseEntity.badRequest().body("Credenciais inválidas!");
+        }
+        
+        if(patientDTO.getBirthDate() < minBirthDateMillis && patientDTO.getBirthDate() > -1) {  // -1 valida as datas após 1970
+            return ResponseEntity.badRequest().body("O paciente deve ser maior de idade!");
         }
 
         if(c.getCode() == null || c.getCode().isBlank()) {

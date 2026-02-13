@@ -100,4 +100,20 @@ class PatientServiceTest {
         verify(cardRepo, never()).save(any());
     }
     
+    @Test
+    @DisplayName("Cadastrar paciente com data de nascimento vazia")
+    public void cadastrarPacienteComDataDeNascimentoVazia() {
+        // Arrange
+        patientDTO.setBirthDate(0L);
+
+        // Act
+        ResponseEntity<?> response = service.savePatient(patientDTO);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(patientRepo, never()).findById(patientDTO.getCpf());
+        verify(patientRepo, never()).save(any());
+        verify(cardRepo, never()).findById(patientDTO.getCardCode());
+        verify(cardRepo, never()).save(any());
+    }
 }
