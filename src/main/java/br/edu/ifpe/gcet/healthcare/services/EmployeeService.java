@@ -4,6 +4,7 @@ import br.edu.ifpe.gcet.healthcare.entities.Employee;
 import br.edu.ifpe.gcet.healthcare.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,9 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepo;
 
+    @Autowired
+    private PasswordEncoder encoder;
+
     public ResponseEntity<?> saveEmployee(Employee e) {
         if(e.getPassword().length() < 6 || isAnyFieldEmptyOrBlank(e)) {
             return ResponseEntity.badRequest().build();
@@ -28,6 +32,7 @@ public class EmployeeService {
             return ResponseEntity.badRequest().build();
         }
         
+        e.setPassword(this.encoder.encode(e.getPassword()));
         employeeRepo.save(e);
         
         return ResponseEntity.ok().body("Funcionário cadastrado com sucesso!");
