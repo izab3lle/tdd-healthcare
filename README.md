@@ -16,7 +16,7 @@ HealthCare é um projeto desenvolvido com TDD para a cadeira de Gerência de Con
 | TC_004 | Realizar cadastro de funcionário com senha vazia                    | [x]   |
 | TC_005 | Realizar cadastro de funcionário com senha abaixo do tamanho mínimo | [x]   |
 | TC_006 | Realizar cadastro de funcionário sem setor                          | [x]   |
-| TC_007 | Realizar login de funcionário com sucesso                           | [ ]   |
+| TC_007 | Realizar login de funcionário com sucesso                           | [x]   |
 | TC_008 | Realizar login de funcionário com email vazio                       | [ ]   |
 | TC_009 | Realizar login de funcionário com email inválido                    | [ ]   |
 | TC_010 | Realizar login de funcionário com senha vazia                       | [ ]   |
