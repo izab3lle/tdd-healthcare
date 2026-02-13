@@ -113,4 +113,18 @@ class AuthServiceTest {
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(employeeRepo, never()).save(e);
     }
+
+    @Test
+    @DisplayName("Realizar login de funcionário com senha inválida")
+    public void realizarLoginDeFuncionarioComSenhaInvalida() {
+        // Arrange
+        loginDTO.setPassword("medico1");
+
+        // Act
+        ResponseEntity<?> response = service.login(loginDTO);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(employeeRepo, never()).save(e);
+    }
 }
