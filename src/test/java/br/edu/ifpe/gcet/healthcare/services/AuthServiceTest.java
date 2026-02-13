@@ -71,6 +71,21 @@ class AuthServiceTest {
         Assertions.assertNotNull(response.getBody());
         Assertions.assertFalse(response.getBody().toString().isBlank());
     }
+
+    @Test
+    @DisplayName("Realizar login de funcionário com email vazio")
+    public void realizarLoginDeFuncionarioComEmailVazio() {
+        // Arrange
+        loginDTO.setLogin("");
+        
+        // Act
+        ResponseEntity<?> response = service.login(loginDTO);
+        
+        // Assert
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(employeeRepo, never()).save(e);
+    }
+    
     
 
 }
