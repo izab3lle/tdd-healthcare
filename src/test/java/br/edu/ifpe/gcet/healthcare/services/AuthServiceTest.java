@@ -68,8 +68,7 @@ class AuthServiceTest {
         verify(employeeRepo, times(1)).findEmployeeByEmail(e.getEmail());
         
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertNotNull(response.getBody());
-        Assertions.assertFalse(response.getBody().toString().isBlank());
+        Assertions.assertEquals("TOKEN", response.getBody());
     }
 
     @Test
