@@ -10,8 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class EmployeeService {
@@ -22,14 +21,18 @@ public class EmployeeService {
     private PasswordEncoder encoder;
 
     public ResponseEntity<?> saveEmployee(Employee e) {
-        if(e.getPassword().length() < 6 || isAnyFieldEmptyOrBlank(e)) {
-            return ResponseEntity.badRequest().build();
+        try {
+            if(isAnyFieldEmptyOrBlank(e) || e.getPassword().length() < 6) {
+                return ResponseEntity.badRequest().body("A senha não pode ter menos de 6 caracteres!");
+            }
+        } catch(IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
         
         Optional<Employee> employee = employeeRepo.findEmployeeByEmail(e.getEmail());
         
         if(employee.isPresent()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("Já existe um funcionário cadastrado com esse email");
         }
         
         e.setPassword(this.encoder.encode(e.getPassword()));
@@ -39,24 +42,22 @@ public class EmployeeService {
     }
     
     private boolean isAnyFieldEmptyOrBlank(Employee e) {
-        Method[] fields = Arrays.stream(e.getClass().getMethods())
-                .filter(m -> m.getName().contains("get") && !m.getName().contains("Id"))
-                .toArray(Method[]::new);
+        HashMap<String, String> fields = new HashMap<>();
         
-        for(Method m : fields) {
-            try {
-                Object field = m.invoke(e);
-                
-                if(field == null) return true;
-                
-                if(m.getReturnType() == String.class) {
-                    if(field.toString().isBlank()) return true;
-                }
-                
-            } catch(InvocationTargetException | IllegalAccessException ex) {
-                throw new RuntimeException("Erro ao acessar um dos campos do objeto");
+        fields.put("email", e.getEmail());
+        fields.put("senha", e.getPassword());
+        fields.put("nome", e.getName());
+        fields.put("departamento", e.getDepartment());
+        
+        fields.forEach((name, field) -> {
+            if(field == null || field.isBlank()) {
+                String msg = (name.equals("senha"))
+                        ? "A senha não pode ser vazia"
+                        : "O " + name + " não pode ser vazio";
+
+                throw new IllegalArgumentException(msg);
             }
-        }
+        });
         
         return false;
     }
