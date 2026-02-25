@@ -1,5 +1,7 @@
 package br.edu.ifpe.gcet.healthcare.dto;
 
+import java.time.LocalDate;
+
 import br.edu.ifpe.gcet.healthcare.entities.HealthInsuranceCard;
 import br.edu.ifpe.gcet.healthcare.entities.Patient;
 import jakarta.persistence.Column;
@@ -8,10 +10,10 @@ public class NewPatientDTO {
     private String cpf;
     private String name;
     private String email;
-    private long birthDate;
+    private LocalDate birthDate;
 
     private String cardCode;
-    private long cardExpirationDate;
+    private LocalDate cardExpirationDate;
     private String cardName;
 
     public String getCpf() {
@@ -38,11 +40,11 @@ public class NewPatientDTO {
         this.email = email;
     }
 
-    public long getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(long birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
@@ -54,11 +56,11 @@ public class NewPatientDTO {
         this.cardCode = cardCode;
     }
 
-    public long getCardExpirationDate() {
+    public LocalDate getCardExpirationDate() {
         return cardExpirationDate;
     }
 
-    public void setCardExpirationDate(long cardExpirationDate) {
+    public void setCardExpirationDate(LocalDate cardExpirationDate) {
         this.cardExpirationDate = cardExpirationDate;
     }
 
@@ -93,4 +95,5 @@ public class NewPatientDTO {
         
         return c;
     }
+    
 }

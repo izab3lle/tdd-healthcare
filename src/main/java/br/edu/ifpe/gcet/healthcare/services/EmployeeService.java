@@ -6,10 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 @Component
@@ -20,37 +16,38 @@ public class EmployeeService {
     @Autowired
     private PasswordEncoder encoder;
 
-    public ResponseEntity<?> saveEmployee(Employee e) {
-        try {
-            if(isAnyFieldEmptyOrBlank(e) || e.getPassword().length() < 6) {
-                return ResponseEntity.badRequest().body("A senha não pode ter menos de 6 caracteres!");
-            }
-        } catch(IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-        
-        Optional<Employee> employee = employeeRepo.findEmployeeByEmail(e.getEmail());
-        
-        if(employee.isPresent()) {
-            return ResponseEntity.badRequest().body("Já existe um funcionário cadastrado com esse email");
-        }
-        
-        e.setPassword(this.encoder.encode(e.getPassword()));
-        employeeRepo.save(e);
-        
-        return ResponseEntity.ok().body("Funcionário cadastrado com sucesso!");
+    public EmployeeService(EmployeeRepository repo, PasswordEncoder passwordEncoder) {
+        this.employeeRepo = repo;
+        this.encoder = passwordEncoder;
     }
-    
+
+    public Optional<Employee> saveEmployee(Employee e) {
+
+        if (isAnyFieldEmptyOrBlank(e) || e.getPassword().length() < 6) {
+            throw new IllegalArgumentException("A senha não pode ter menos de 6 caracteres!");
+        }
+
+        Optional<Employee> employee = employeeRepo.findEmployeeByEmail(e.getEmail());
+
+        if (employee.isPresent()) {
+            return Optional.empty();
+        }
+
+        e.setPassword(this.encoder.encode(e.getPassword()));
+
+        return Optional.of(employeeRepo.save(e));
+    }
+
     private boolean isAnyFieldEmptyOrBlank(Employee e) {
         HashMap<String, String> fields = new HashMap<>();
-        
+
         fields.put("email", e.getEmail());
         fields.put("senha", e.getPassword());
         fields.put("nome", e.getName());
         fields.put("departamento", e.getDepartment());
-        
+
         fields.forEach((name, field) -> {
-            if(field == null || field.isBlank()) {
+            if (field == null || field.isBlank()) {
                 String msg = (name.equals("senha"))
                         ? "A senha não pode ser vazia"
                         : "O " + name + " não pode ser vazio";
@@ -58,7 +55,7 @@ public class EmployeeService {
                 throw new IllegalArgumentException(msg);
             }
         });
-        
+
         return false;
     }
 }

@@ -1,5 +1,7 @@
 package br.edu.ifpe.gcet.healthcare.entities;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -7,7 +9,7 @@ public class HealthInsuranceCard {
     @Id
     @Column(unique = true)
     private String code;
-    private long expirationDate;
+    private LocalDate expirationDate;
     private String name;
     
     @ManyToOne
@@ -22,11 +24,11 @@ public class HealthInsuranceCard {
         this.code = code;
     }
 
-    public long getExpirationDate() {
+    public LocalDate getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(long expirationDate) {
+    public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
     }
 

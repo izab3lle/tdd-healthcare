@@ -1,5 +1,7 @@
 package br.edu.ifpe.gcet.healthcare.entities;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -12,7 +14,7 @@ public class Patient {
     @Column(nullable = false)
     private String name;
     private String email;
-    private long birthDate;
+    private LocalDate birthDate;
 
     public String getCpf() {
         return cpf;
@@ -38,11 +40,11 @@ public class Patient {
         this.email = email;
     }
 
-    public long getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(long birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 }

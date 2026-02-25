@@ -19,8 +19,14 @@ public class AuthService {
     private EmployeeRepository employeeRepo;
     @Autowired
     private PasswordEncoder encoder;
+
+    public AuthService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder, JwtUtils utils) {
+        this.employeeRepo = employeeRepository;
+        this.encoder = passwordEncoder;
+        this.jwtUtils = utils;
+    }
     
-    public ResponseEntity<?> login(EmployeeLoginDTO loginDTO) {
+    public Optional<String> login(EmployeeLoginDTO loginDTO) {
 
         Optional<Employee> employee = employeeRepo.findEmployeeByEmail(loginDTO.getLogin());
         
@@ -28,11 +34,11 @@ public class AuthService {
             Employee loggedUser = employee.get();
             
             if(this.encoder.matches(loginDTO.getPassword(), loggedUser.getPassword())) {
-                return ResponseEntity.ok(this.jwtUtils
-                        .generateToken(loggedUser.getEmail(), "USER"));
+                return Optional.of((this.jwtUtils
+                        .generateToken(loggedUser.getEmail(), "USER")));
             }
         }
         
-        return ResponseEntity.badRequest().body("Credenciais Inválidas!");
+        throw new IllegalArgumentException("Credenciais inválidas!");
     }
 }

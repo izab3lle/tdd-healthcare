@@ -6,10 +6,9 @@ import br.edu.ifpe.gcet.healthcare.entities.Patient;
 import br.edu.ifpe.gcet.healthcare.repositories.HealthInsuranceCardRepository;
 import br.edu.ifpe.gcet.healthcare.repositories.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Component
@@ -20,36 +19,34 @@ public class PatientService {
     @Autowired
     private HealthInsuranceCardRepository cardRepo;
     
-    public ResponseEntity<?> savePatient(NewPatientDTO patientDTO) {
+    public PatientService(PatientRepository patientRepository, HealthInsuranceCardRepository cardRepository) {
+        this.patientRepo = patientRepository;
+        this.cardRepo = cardRepository;
+    }
+    
+    public Optional<Patient> savePatient(NewPatientDTO patientDTO) {
         Patient p = patientDTO.getPatient();
         HealthInsuranceCard c = patientDTO.getHealthInsuranceCard();
         
-        Calendar minBirthDate = Calendar.getInstance();
-        minBirthDate.add(Calendar.YEAR, -18);
-        long minBirthDateMillis = minBirthDate.getTimeInMillis();
+        LocalDate minBirthDate = LocalDate.now().minusYears(18);
         
         if(p.getCpf() == null || p.getEmail().isBlank() || p.getName().isBlank()) {
-            return ResponseEntity.badRequest().body("Credenciais inválidas!");
+            throw new IllegalArgumentException("Credenciais inválidas!");
         }
         
-        if(patientDTO.getBirthDate() < minBirthDateMillis && patientDTO.getBirthDate() > -1) {  // -1 valida as datas após 1970
-            return ResponseEntity.badRequest().body("O paciente deve ser maior de idade!");
-        }
-
-        if(c.getCode() == null || c.getCode().isBlank()) {
-            return ResponseEntity.badRequest().body("Credenciais da carteira do plano inválidas!");
+        if(patientDTO.getBirthDate().isAfter(minBirthDate)) {
+            throw new IllegalArgumentException("O paciente deve ser maior de idade!");
         }
 
         Optional<Patient> patient = patientRepo.findById(p.getCpf());
         Optional<HealthInsuranceCard> card = cardRepo.findById(c.getCode());
         
         if(patient.isPresent() || card.isPresent()) {
-            return ResponseEntity.badRequest().build();
+            return Optional.empty();
         }
         
-        patientRepo.save(p);
         cardRepo.save(c);
-        
-        return ResponseEntity.ok().body("Paciente cadastrado com sucesso!");
+
+        return Optional.ofNullable(patientRepo.save(p));
     }
 }
