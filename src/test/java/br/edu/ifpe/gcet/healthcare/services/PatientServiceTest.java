@@ -19,8 +19,11 @@ import org.springframework.http.ResponseEntity;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +34,6 @@ class PatientServiceTest {
     @Mock
     private HealthInsuranceCardRepository cardRepo;
     
-    @Autowired
     @InjectMocks
     private PatientService service;
     
@@ -40,17 +42,16 @@ class PatientServiceTest {
     @BeforeEach
     public void initMockPatient() throws ParseException {
         patientDTO = new NewPatientDTO();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         patientDTO.setCpf("355.129.694-47");
         patientDTO.setEmail("paciente@gmail.com");
         patientDTO.setName("Paciente");
-        patientDTO.setBirthDate(new SimpleDateFormat("MM/dd/yyyy")
-                .parse("22/12/1931").getTime());
+        patientDTO.setBirthDate(LocalDate.parse("22/12/1931", formatter));
 
         patientDTO.setCardCode("193746824");
         patientDTO.setCardName("SUS");
-        patientDTO.setCardExpirationDate(new SimpleDateFormat("MM/dd/yyyy")
-                .parse("02/05/2026").getTime());
+        patientDTO.setCardExpirationDate(LocalDate.parse("02/05/2026", formatter));
     }
     
     @Test
@@ -60,10 +61,9 @@ class PatientServiceTest {
         when(patientRepo.findById(patientDTO.getCpf())).thenReturn(Optional.empty());
         
         // Act
-        ResponseEntity<?> response = service.savePatient(patientDTO);
+        Optional<Patient> patient = service.savePatient(patientDTO);
         
         // Assert
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(patientRepo, times(1)).findById(patientDTO.getCpf());
         verify(patientRepo, times(1)).save(any());
     }
@@ -75,10 +75,9 @@ class PatientServiceTest {
         when(cardRepo.findById(patientDTO.getCardCode())).thenReturn(Optional.empty());
 
         // Act
-        ResponseEntity<?> response = service.savePatient(patientDTO);
+        Optional<Patient> patient = service.savePatient(patientDTO);
 
         // Assert
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(cardRepo, times(1)).findById(patientDTO.getCardCode());
         verify(cardRepo, times(1)).save(any());
     }
@@ -88,12 +87,12 @@ class PatientServiceTest {
     public void cadastrarPacienteComNomeVazio() {
         // Arrange
         patientDTO.setName("");
-        
-        // Act
-        ResponseEntity<?> response = service.savePatient(patientDTO);
 
-        // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        // Act + Assert
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> service.savePatient(patientDTO));
+
         verify(patientRepo, never()).findById(patientDTO.getCpf());
         verify(patientRepo, never()).save(any());
         verify(cardRepo, never()).findById(patientDTO.getCardCode());
@@ -104,13 +103,13 @@ class PatientServiceTest {
     @DisplayName("Cadastrar paciente com data de nascimento vazia")
     public void cadastrarPacienteComDataDeNascimentoVazia() {
         // Arrange
-        patientDTO.setBirthDate(0L);
+        patientDTO.setBirthDate(LocalDate.now());
 
-        // Act
-        ResponseEntity<?> response = service.savePatient(patientDTO);
-
-        // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        // Act + Assert
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> service.savePatient(patientDTO));
+            
         verify(patientRepo, never()).findById(patientDTO.getCpf());
         verify(patientRepo, never()).save(any());
         verify(cardRepo, never()).findById(patientDTO.getCardCode());

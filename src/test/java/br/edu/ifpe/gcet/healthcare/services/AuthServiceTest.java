@@ -28,7 +28,6 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder encoder;
     
-    @Autowired
     @InjectMocks
     private AuthService service;
     
@@ -60,15 +59,13 @@ class AuthServiceTest {
         when(employeeRepo.findEmployeeByEmail(loginDTO.getLogin())).thenReturn(Optional.of(e));
         when(encoder.matches(e.getPassword(), loginDTO.getPassword())).thenReturn(true);
         when(jwtUtils.generateToken(e.getEmail(), "USER")).thenReturn("TOKEN");
-        
+
         // Act
-        ResponseEntity<?> response = service.login(loginDTO);
-        
+        Optional<String> optional = service.login(loginDTO);
+
         // Assert
         verify(employeeRepo, times(1)).findEmployeeByEmail(e.getEmail());
-        
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals("TOKEN", response.getBody());
+        Assertions.assertEquals("TOKEN", optional.get());
     }
 
     @Test
@@ -76,12 +73,11 @@ class AuthServiceTest {
     public void realizarLoginDeFuncionarioComEmailVazio() {
         // Arrange
         loginDTO.setLogin("");
-        
-        // Act
-        ResponseEntity<?> response = service.login(loginDTO);
-        
-        // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+        // Act + Assert
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> service.login(loginDTO));
         verify(employeeRepo, never()).save(e);
     }
 
@@ -90,12 +86,11 @@ class AuthServiceTest {
     public void realizarLoginDeFuncionarioComEmailInválido() {
         // Arrange
         loginDTO.setLogin("medico@gmail.com");
-        
-        // Act
-        ResponseEntity<?> response = service.login(loginDTO);
 
-        // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        // Act + Assert
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> service.login(loginDTO));
         verify(employeeRepo, never()).save(e);
     }
 
@@ -105,11 +100,10 @@ class AuthServiceTest {
         // Arrange
         loginDTO.setPassword("");
 
-        // Act
-        ResponseEntity<?> response = service.login(loginDTO);
-
-        // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        // Act + Assert
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> service.login(loginDTO));
         verify(employeeRepo, never()).save(e);
     }
 
@@ -119,11 +113,10 @@ class AuthServiceTest {
         // Arrange
         loginDTO.setPassword("medico1");
 
-        // Act
-        ResponseEntity<?> response = service.login(loginDTO);
-
-        // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        // Act + Assert
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> service.login(loginDTO));
         verify(employeeRepo, never()).save(e);
     }
 }

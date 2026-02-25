@@ -7,11 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -26,7 +21,6 @@ public class EmployeeServiceTest {
     @Mock
     private PasswordEncoder encoder;
     
-    @Autowired
     @InjectMocks
     private EmployeeService service;
     
@@ -49,10 +43,9 @@ public class EmployeeServiceTest {
         when(repository.save(e)).thenReturn(e);
 
         // Act
-        ResponseEntity<?> response = service.saveEmployee(e);
-        
+        Optional<Employee> optional = service.saveEmployee(e);
+
         // Assert
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(repository, times(1)).findEmployeeByEmail(e.getEmail());
         verify(repository, times(1)).save(e);
     }
@@ -63,11 +56,11 @@ public class EmployeeServiceTest {
         // Arrange
         e.setName("");
 
-        // Act
-        ResponseEntity<?> response = service.saveEmployee(e);
+        // Act + Assert
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> service.saveEmployee(e));
 
-        // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(repository, never()).save(e);
     }
 
@@ -77,11 +70,11 @@ public class EmployeeServiceTest {
         // Arrange
         e.setEmail("");
 
-        // Act
-        ResponseEntity<?> response = service.saveEmployee(e);
+        // Act + Assert
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> service.saveEmployee(e));
 
-        // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(repository, never()).save(e);
     }
 
@@ -91,39 +84,39 @@ public class EmployeeServiceTest {
         // Arrange
         e.setPassword("");
 
-        // Act
-        ResponseEntity<?> response = service.saveEmployee(e);
+        // Act + Assert
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> service.saveEmployee(e));
 
-        // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(repository, never()).save(e);
     }
-    
+
     @Test
     @DisplayName("Cadastrar funcionário com senha abaixo do tamanho mínimo")
     public void cadastrarFuncionarioComSenhaInvalida() {
         // Arrange
         e.setPassword("123");
-        
-        // Act
-        ResponseEntity<?> response = service.saveEmployee(e);
-        
-        // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+        // Act + Assert
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> service.saveEmployee(e));
+
         verify(repository, never()).save(e);
     }
-    
+
     @Test
     @DisplayName("Cadastrar funcionário sem setor")
     public void cadastrarFuncionarioSemSetor() {
         // Arrange
-        e.setDepartment(null);
+        e.setDepartment("");
 
-        // Act
-        ResponseEntity<?> response = service.saveEmployee(e);
+        // Act + Assert
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> service.saveEmployee(e));
 
-        // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(repository, never()).save(e);
     }
 }
