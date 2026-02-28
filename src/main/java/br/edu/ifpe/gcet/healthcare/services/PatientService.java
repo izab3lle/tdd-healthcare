@@ -16,37 +16,27 @@ public class PatientService {
     @Autowired
     private PatientRepository patientRepo;
     
-    @Autowired
-    private HealthInsuranceCardRepository cardRepo;
-    
-    public PatientService(PatientRepository patientRepository, HealthInsuranceCardRepository cardRepository) {
+    public PatientService(PatientRepository patientRepository) {
         this.patientRepo = patientRepository;
-        this.cardRepo = cardRepository;
     }
     
-    public Optional<Patient> savePatient(NewPatientDTO patientDTO) {
-        Patient p = patientDTO.getPatient();
-        HealthInsuranceCard c = patientDTO.getHealthInsuranceCard();
-        
+    public Optional<Patient> savePatient(Patient patient) {
         LocalDate minBirthDate = LocalDate.now().minusYears(18);
         
-        if(p.getCpf() == null || p.getEmail().isBlank() || p.getName().isBlank()) {
+        if(patient.getCpf() == null || patient.getEmail().isBlank() || patient.getName().isBlank()) {
             throw new IllegalArgumentException("Credenciais inválidas!");
         }
         
-        if(patientDTO.getBirthDate().isAfter(minBirthDate)) {
+        if(patient.getBirthDate().isAfter(minBirthDate)) {
             throw new IllegalArgumentException("O paciente deve ser maior de idade!");
         }
 
-        Optional<Patient> patient = patientRepo.findById(p.getCpf());
-        Optional<HealthInsuranceCard> card = cardRepo.findById(c.getCode());
+        Optional<Patient> p = patientRepo.findById(patient.getCpf());
         
-        if(patient.isPresent() || card.isPresent()) {
+        if(p.isPresent()) {
             return Optional.empty();
         }
-        
-        cardRepo.save(c);
 
-        return Optional.ofNullable(patientRepo.save(p));
+        return Optional.ofNullable(patientRepo.save(patient));
     }
 }

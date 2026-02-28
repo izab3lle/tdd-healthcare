@@ -25,9 +25,9 @@ public class HealthInsuranceCardService {
         Optional<HealthInsuranceCard> card = cardRepo.findById(c.getCode());
 
         if(card.isPresent()) {
-            return null;
+            return Optional.empty();
         }
 
-        return Optional.of(cardRepo.save(c));
+        return Optional.ofNullable(cardRepo.save(c));
     }
 }
